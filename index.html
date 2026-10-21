@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#0B0F14">
   <meta name="mobile-web-app-capable" content="yes">
@@ -171,8 +172,8 @@
     .activity {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 18px 32px;
+      justify-content: flex-start;
+      gap: 36px;
       padding: 26px 28px;
     }
 
@@ -220,12 +221,15 @@
     .ring-arc.ring-exercise { transition-delay: 0.16s; }
     .ring-arc.ring-stand { transition-delay: 0.28s; }
 
+    /* Tight stack, vertically centered beside the rings — not stretched down the card. */
     .metrics {
-      flex: 1 1 220px;
+      flex: none;
+      align-self: center;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      gap: 20px;
+      gap: 24px;
+      width: max-content;
+      max-width: 100%;
       min-width: 0;
     }
 
@@ -291,7 +295,7 @@
       max-width: 5px;
       justify-self: center;
       height: calc(var(--scale) * var(--chart-h));
-      border-radius: 999px;
+      border-radius: 2px;
       transform: scaleY(0);
       transform-origin: bottom center;
       animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
@@ -377,6 +381,96 @@
       padding-bottom: 20px;
     }
 
+    /* ---------- Activity log (added; existing cards are unchanged) ---------- */
+    .log-form {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 14px 16px;
+    }
+
+    .log-fields {
+      flex: 1 1 460px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .log-form label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+      color: var(--text-dim);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    .log-form input {
+      width: 100%;
+      min-height: 48px;
+      margin: 0;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--bg);
+      color: var(--text);
+      font: inherit;
+      font-size: 16px;
+      font-variant-numeric: tabular-nums;
+      touch-action: manipulation;
+    }
+
+    .log-form input:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+
+    .log-actions {
+      display: flex;
+      flex: none;
+      gap: 8px;
+    }
+
+    .log-form button {
+      margin: 0;
+      min-height: 48px;
+      padding: 12px 16px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--bg);
+      font: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .log-form button:focus-visible {
+      outline: 2px solid var(--text);
+      outline-offset: 2px;
+    }
+
+    #add-walk {
+      background: transparent;
+      color: var(--accent);
+      box-shadow: inset 0 0 0 1.5px var(--accent);
+    }
+
+    /* Brief acknowledgement when a walk is added. */
+    .rings.is-pulsing {
+      animation: ring-pulse 0.7s ease;
+    }
+
+    @keyframes ring-pulse {
+      0%,
+      100% { transform: scale(1); filter: brightness(1); }
+      40% { transform: scale(1.05); filter: brightness(1.35); }
+    }
+
     @media (max-width: 639px) {
       .dashboard {
         padding:
@@ -396,7 +490,7 @@
 
       .activity {
         padding: 18px 14px;
-        gap: 12px;
+        gap: 20px;
       }
 
       .rings {
@@ -405,8 +499,7 @@
       }
 
       .metrics {
-        flex-basis: 0;
-        gap: 14px;
+        gap: 24px;
       }
 
       .metric {
@@ -420,6 +513,18 @@
 
       .stat-value {
         font-size: 32px;
+      }
+
+      .log-fields {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .log-actions {
+        width: 100%;
+      }
+
+      .log-actions button {
+        flex: 1;
       }
     }
 
@@ -441,7 +546,8 @@
         transition: none;
       }
 
-      .bar {
+      .bar,
+      .rings.is-pulsing {
         animation: none;
         transform: none;
       }
@@ -471,28 +577,48 @@
       </svg>
     </header>
 
+    <form class="card log-form" id="log-form">
+      <div class="log-fields">
+        <label for="steps">Steps taken today
+          <input id="steps" name="steps" type="number" min="0" step="1" inputmode="numeric" value="12484">
+        </label>
+        <label for="calories">Active energy (CAL)
+          <input id="calories" name="calories" type="number" min="0" step="1" inputmode="numeric" value="858">
+        </label>
+        <label for="minutes">Exercise minutes
+          <input id="minutes" name="minutes" type="number" min="0" step="1" inputmode="numeric" value="110">
+        </label>
+        <label for="hours">Stand hours
+          <input id="hours" name="hours" type="number" min="0" step="1" inputmode="numeric" value="16">
+        </label>
+      </div>
+      <div class="log-actions">
+        <button type="submit">Update</button>
+        <button type="button" id="add-walk">Add a walk</button>
+      </div>
+    </form>
+
     <!--
       Concentric rings, left side of the card. Move is outer, Exercise
-      middle, Stand inner. Goals are already past 100%, so each arc closes.
-      Totals stay in the rows on the right.
+      middle, Stand inner. Each arc is value / goal, capped at one full turn.
     -->
     <section class="card activity" aria-label="Activity">
       <div class="rings">
         <svg viewBox="0 0 220 220" role="img" aria-label="Move 858 of 700 calories, Exercise 110 of 30 minutes, Stand 16 of 10 hours. All three goals are complete.">
           <g transform="rotate(-90 110 110)">
             <circle class="ring-track ring-move" cx="110" cy="110" r="92"/>
-            <circle class="ring-track ring-exercise" cx="110" cy="110" r="70"/>
-            <circle class="ring-track ring-stand" cx="110" cy="110" r="48"/>
+            <circle class="ring-track ring-exercise" cx="110" cy="110" r="61"/>
+            <circle class="ring-track ring-stand" cx="110" cy="110" r="30"/>
 
             <circle class="ring-arc ring-move" cx="110" cy="110" r="92"
               data-value="858" data-goal="700"
               stroke-dasharray="578.05" stroke-dashoffset="578.05"/>
-            <circle class="ring-arc ring-exercise" cx="110" cy="110" r="70"
+            <circle class="ring-arc ring-exercise" cx="110" cy="110" r="61"
               data-value="110" data-goal="30"
-              stroke-dasharray="439.82" stroke-dashoffset="439.82"/>
-            <circle class="ring-arc ring-stand" cx="110" cy="110" r="48"
+              stroke-dasharray="383.27" stroke-dashoffset="383.27"/>
+            <circle class="ring-arc ring-stand" cx="110" cy="110" r="30"
               data-value="16" data-goal="10"
-              stroke-dasharray="301.59" stroke-dashoffset="301.59"/>
+              stroke-dasharray="188.50" stroke-dashoffset="188.50"/>
           </g>
         </svg>
       </div>
@@ -500,15 +626,15 @@
       <div class="metrics">
         <div class="metric">
           <span class="metric-label">Move</span>
-          <span class="metric-value tone-move">858/700<span class="unit">CAL</span></span>
+          <span class="metric-value tone-move"><span id="move-value">858</span>/700<span class="unit">CAL</span></span>
         </div>
         <div class="metric">
           <span class="metric-label">Exercise</span>
-          <span class="metric-value tone-exercise">110/30<span class="unit">MIN</span></span>
+          <span class="metric-value tone-exercise"><span id="exercise-value">110</span>/30<span class="unit">MIN</span></span>
         </div>
         <div class="metric">
           <span class="metric-label">Stand</span>
-          <span class="metric-value tone-stand">16/10<span class="unit">HRS</span></span>
+          <span class="metric-value tone-stand"><span id="stand-value">16</span>/10<span class="unit">HRS</span></span>
         </div>
       </div>
     </section>
@@ -522,7 +648,7 @@
           </svg>
         </div>
         <p class="eyebrow eyebrow-stat">Today</p>
-        <p class="stat-value">12,484</p>
+        <p class="stat-value" id="step-count">12,484</p>
         <div class="bars" id="step-bars" role="img" aria-label="Hourly steps today, with a spike around 5 PM"></div>
       </article>
 
@@ -534,7 +660,7 @@
           </svg>
         </div>
         <p class="eyebrow eyebrow-stat">Today</p>
-        <p class="stat-value">5.80<span class="unit">MI</span></p>
+        <p class="stat-value"><span id="distance-value">5.87</span><span class="unit">MI</span></p>
         <div class="bars" id="distance-bars" role="img" aria-label="Hourly step distance today, with one spike around 5 PM"></div>
       </article>
     </section>
@@ -550,7 +676,7 @@
           </div>
           <div>
             <h3 class="session-name">Outdoor Walk</h3>
-            <p class="session-distance">2.04<span class="unit">MI</span></p>
+            <p class="session-distance"><span id="walk-value">5.87</span><span class="unit">MI</span></p>
             <p class="eyebrow">Today</p>
           </div>
         </div>
@@ -591,60 +717,132 @@
 
   <script>
     (function () {
-      var arcs = document.querySelectorAll(".ring-arc");
+      var GOALS = { calories: 700, minutes: 30, hours: 10 };
+      var DEFAULTS = { steps: 12484, calories: 858, minutes: 110, hours: 16 };
+      var STORAGE_KEY = "fitness-summary";
+      var MILES_PER_STEP = 0.00047;
+      /* Default step total fills the chart; other totals scale every bar from this. */
+      var REFERENCE_STEPS = 12484;
       var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      var rings = document.querySelector(".rings");
+      var ringSvg = rings.querySelector("svg");
+      var arcs = {
+        move: document.querySelector(".ring-arc.ring-move"),
+        exercise: document.querySelector(".ring-arc.ring-exercise"),
+        stand: document.querySelector(".ring-arc.ring-stand")
+      };
+      var fields = {
+        steps: document.getElementById("steps"),
+        calories: document.getElementById("calories"),
+        minutes: document.getElementById("minutes"),
+        hours: document.getElementById("hours")
+      };
+
+      /*
+        24 hours, midnight through 11 PM. Values are percent of chart height
+        at the reference step count. Overnight stays in the 15–25% band,
+        the day climbs, and index 17 (5 PM) spikes. Distance uses the same shape.
+      */
+      var hourlyShape = [
+        20, 18, 16, 15, 16, 18, 22, 28, 34, 38, 42, 46,
+        50, 48, 54, 62, 72, 100, 58, 44, 36, 30, 24, 20
+      ];
 
       function circumference(arc) {
         return 2 * Math.PI * arc.r.baseVal.value;
       }
 
-      /*
-        Goals are over 100%, so each ring draws one full revolution.
-        A few extra pixels of dash overlap the seam; round caps would
-        otherwise leave a hairline gap at 12 o'clock.
-      */
-      function ringGeometry(arc) {
+      function amount(value) {
+        var number = Number(value);
+        if (!isFinite(number) || number < 0) return 0;
+        return number;
+      }
+
+      function formatAmount(number) {
+        var rounded = Math.round(number * 10) / 10;
+        return String(rounded);
+      }
+
+      function formatSteps(number) {
+        return Math.round(number).toLocaleString("en-US");
+      }
+
+      function formatMiles(steps) {
+        return (steps * MILES_PER_STEP).toFixed(2);
+      }
+
+      function readForm() {
+        return {
+          steps: Math.round(amount(fields.steps.value)),
+          calories: amount(fields.calories.value),
+          minutes: amount(fields.minutes.value),
+          hours: amount(fields.hours.value)
+        };
+      }
+
+      function writeForm(state) {
+        fields.steps.value = String(Math.round(state.steps));
+        fields.calories.value = formatAmount(state.calories);
+        fields.minutes.value = formatAmount(state.minutes);
+        fields.hours.value = formatAmount(state.hours);
+      }
+
+      function loadState() {
+        try {
+          var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+          if (!saved || typeof saved !== "object") return null;
+          return {
+            steps: amount(saved.steps),
+            calories: amount(saved.calories),
+            minutes: amount(saved.minutes),
+            hours: amount(saved.hours)
+          };
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function saveState(state) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (error) {
+          /* Private mode can block storage; the live view still updates. */
+        }
+      }
+
+      /* Arc length is value / goal, drawn with stroke-dashoffset and capped at one turn. */
+      function ringTarget(arc, value, goal) {
         var length = circumference(arc);
-        var ratio = Math.min(Math.max(Number(arc.dataset.value) / Number(arc.dataset.goal), 0), 1);
-        var dash = length * ratio + (ratio >= 0.999 ? 14 : 0);
-        return { length: length, dash: dash };
+        var ratio = goal > 0 ? Math.min(Math.max(value / goal, 0), 1) : 0;
+        return {
+          length: length,
+          offset: ratio >= 0.999 ? 0 : length * (1 - ratio)
+        };
       }
 
-      arcs.forEach(function (arc) {
-        var geometry = ringGeometry(arc);
-        arc.style.transition = "none";
-        arc.style.strokeDasharray = geometry.dash + " " + geometry.length;
-        arc.style.strokeDashoffset = String(geometry.dash);
-      });
-
-      void document.body.offsetWidth;
-      arcs.forEach(function (arc) {
-        arc.style.transition = "";
-      });
-
-      function drawRings() {
-        arcs.forEach(function (arc) {
-          arc.style.strokeDashoffset = "0";
-        });
+      function paintRing(arc, dash, offset) {
+        var dashValue = dash + " " + dash;
+        var offsetValue = String(offset);
+        /* Attribute and style both, so iOS paints the new arc. */
+        arc.setAttribute("stroke-dasharray", dashValue);
+        arc.setAttribute("stroke-dashoffset", offsetValue);
+        arc.style.strokeDasharray = dashValue;
+        arc.style.strokeDashoffset = offsetValue;
       }
 
-      if (reduceMotion) {
-        drawRings();
-      } else {
-        requestAnimationFrame(function () {
-          requestAnimationFrame(drawRings);
-        });
+      function setRing(arc, value, goal, intro) {
+        var geometry = ringTarget(arc, value, goal);
+        arc.dataset.value = String(value);
+        arc.dataset.goal = String(goal);
+        arc.dataset.offset = String(geometry.offset);
+        if (intro && !reduceMotion) {
+          arc.style.transition = "none";
+          paintRing(arc, geometry.length, geometry.length);
+          return;
+        }
+        paintRing(arc, geometry.length, geometry.offset);
       }
-
-      /* 24 hours, midnight through 11 PM. Index 17 is 5 PM — the day's spike. */
-      var stepHours = [
-        8, 5, 4, 3, 4, 7, 12, 18, 26, 16, 12, 14,
-        20, 14, 11, 16, 24, 100, 32, 18, 12, 9, 7, 5
-      ];
-      var distanceHours = [
-        6, 4, 3, 3, 4, 6, 10, 14, 18, 12, 10, 12,
-        16, 11, 8, 12, 20, 100, 28, 14, 10, 7, 5, 4
-      ];
 
       function hourName(index) {
         var hour = index % 12 || 12;
@@ -652,21 +850,141 @@
         return hour + " " + suffix;
       }
 
+      function scaledShape(steps) {
+        var factor = REFERENCE_STEPS > 0 ? steps / REFERENCE_STEPS : 0;
+        return hourlyShape.map(function (sample) {
+          return Math.min(sample * factor, 100);
+        });
+      }
+
       function mountBars(container, samples) {
         var fragment = document.createDocumentFragment();
         samples.forEach(function (sample, index) {
           var bar = document.createElement("span");
           bar.className = "bar";
-          bar.style.setProperty("--scale", String(Math.max(sample, 6) / 100));
+          bar.style.setProperty("--scale", String(sample / 100));
           bar.style.setProperty("--i", String(index));
           bar.title = hourName(index);
           fragment.appendChild(bar);
         });
+        while (container.firstChild) container.removeChild(container.firstChild);
         container.appendChild(fragment);
       }
 
-      mountBars(document.getElementById("step-bars"), stepHours);
-      mountBars(document.getElementById("distance-bars"), distanceHours);
+      var renderGeneration = 0;
+
+      function render(state, intro) {
+        var generation = ++renderGeneration;
+        setRing(arcs.move, state.calories, GOALS.calories, intro);
+        setRing(arcs.exercise, state.minutes, GOALS.minutes, intro);
+        setRing(arcs.stand, state.hours, GOALS.hours, intro);
+        if (intro && !reduceMotion) {
+          void document.body.offsetWidth;
+          Object.keys(arcs).forEach(function (name) {
+            arcs[name].style.transition = "";
+          });
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              if (generation !== renderGeneration) return;
+              Object.keys(arcs).forEach(function (name) {
+                var arc = arcs[name];
+                var shown = arc.dataset.offset;
+                arc.setAttribute("stroke-dashoffset", shown);
+                arc.style.strokeDashoffset = shown;
+              });
+            });
+          });
+        }
+
+        document.getElementById("move-value").textContent = formatAmount(state.calories);
+        document.getElementById("exercise-value").textContent = formatAmount(state.minutes);
+        document.getElementById("stand-value").textContent = formatAmount(state.hours);
+        document.getElementById("step-count").textContent = formatSteps(state.steps);
+
+        var miles = formatMiles(state.steps);
+        document.getElementById("distance-value").textContent = miles;
+        document.getElementById("walk-value").textContent = miles;
+
+        var shape = scaledShape(state.steps);
+        mountBars(document.getElementById("step-bars"), shape);
+        mountBars(document.getElementById("distance-bars"), shape);
+
+        ringSvg.setAttribute("aria-label",
+          "Move " + formatAmount(state.calories) + " of " + GOALS.calories + " calories, " +
+          "Exercise " + formatAmount(state.minutes) + " of " + GOALS.minutes + " minutes, " +
+          "Stand " + formatAmount(state.hours) + " of " + GOALS.hours + " hours."
+        );
+      }
+
+      function commit(state, intro) {
+        writeForm(state);
+        saveState(state);
+        render(state, intro);
+      }
+
+      function pulseRings() {
+        if (reduceMotion) return;
+        rings.classList.remove("is-pulsing");
+        void rings.offsetWidth;
+        rings.classList.add("is-pulsing");
+      }
+
+      function showActivity() {
+        var activity = document.querySelector(".activity");
+        if (!activity || !activity.scrollIntoView) return;
+        window.setTimeout(function () {
+          activity.scrollIntoView({ block: "start", inline: "nearest" });
+        }, 60);
+      }
+
+      var lastAction = 0;
+
+      function applyAction(buildState, pulse) {
+        var now = Date.now();
+        if (now - lastAction < 700) return;
+        lastAction = now;
+        var active = document.activeElement;
+        if (active && active.blur) active.blur();
+        var state = buildState();
+        commit(state, false);
+        if (pulse) pulseRings();
+        showActivity();
+      }
+
+      document.getElementById("log-form").addEventListener("submit", function (event) {
+        event.preventDefault();
+        applyAction(readForm, false);
+      });
+
+      /* A phone keyboard shifts the page, so the tap can miss the click. */
+      document.querySelector("#log-form button[type='submit']").addEventListener("touchstart", function (event) {
+        if (event.cancelable) event.preventDefault();
+        applyAction(readForm, false);
+      }, { passive: false });
+
+      function addWalk() {
+        applyAction(function () {
+          var state = readForm();
+          state.steps += 500 + Math.floor(Math.random() * 1501);
+          state.minutes += 5 + Math.floor(Math.random() * 16);
+          return state;
+        }, true);
+      }
+
+      var addWalkButton = document.getElementById("add-walk");
+      addWalkButton.addEventListener("click", addWalk);
+      addWalkButton.addEventListener("touchstart", function (event) {
+        if (event.cancelable) event.preventDefault();
+        addWalk();
+      }, { passive: false });
+
+      rings.addEventListener("animationend", function () {
+        rings.classList.remove("is-pulsing");
+      });
+
+      var initial = loadState() || DEFAULTS;
+      writeForm(initial);
+      render(initial, true);
     })();
   </script>
 </body>
